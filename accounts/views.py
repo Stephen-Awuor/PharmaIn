@@ -1,7 +1,9 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from .forms import CreateUserForm  # <-- use your custom form
+from .forms import CreateUserForm  
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth import logout
+from .models import User
 
 def register(request):
     form = CreateUserForm()
@@ -17,3 +19,11 @@ def register(request):
 def dashboard(request):
     return render(request, 'accounts/dashboard.html') 
 
+def logoutUser(request):
+    logout(request)
+    return redirect('login')  
+
+@login_required
+def users_list(request):
+    users = User.objects.all()
+    return render(request, 'accounts/users.html', {'users': users})

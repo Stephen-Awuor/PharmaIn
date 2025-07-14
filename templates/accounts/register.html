@@ -39,15 +39,30 @@
       {% csrf_token %}
 
       <div class="mb-3">
+        <label for="id_email" class="form-label">Fist Name</label>
+        <input type="first_name" name="first_name" class="form-control" id="first_name" required>
+      </div>
+
+      <div class="mb-3">
+        <label for="id_email" class="form-label">Last Name</label>
+        <input type="last_name" name="last_name" class="form-control" id="last_name" required>
+      </div>
+
+      <div class="mb-3">
         <label for="id_email" class="form-label">Email</label>
         <input type="email" name="email" class="form-control" id="id_email" required>
       </div>
-      
+
       <div class="mb-3">
-        <label for="id_username" class="form-label">Username</label>
-        <input type="text" name="username" class="form-control" id="id_username" required>
+        <label for="id_email" class="form-label">Phone Number</label>
+        <input type="phone_number" name="phone_number" class="form-control" id="phone_number" required>
       </div>
 
+      <div class="mb-3">
+        <label for="id_email" class="form-label">Username</label>
+        <input type="username" name="username" class="form-control" id="username" required>
+      </div>
+      
       <div class="mb-3">
         <label for="id_password1" class="form-label">Password</label>
         <input type="password" name="password1" class="form-control" id="id_password1" required>
@@ -58,7 +73,7 @@
         <input type="password" name="password2" class="form-control" id="id_password2" required>
       </div>
 
-      <button type="submit" class="btn btn-success w-100">Register</button>
+      <button type="submit" class="btn btn-primary w-100">Register</button>
     </form>
 
     {% if form.errors %}

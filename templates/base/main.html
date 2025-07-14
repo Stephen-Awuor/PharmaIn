@@ -55,7 +55,7 @@
       <li class="nav-item dropdown">
         <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#">Accounts</a>
         <ul class="dropdown-menu">
-          <li><a class="dropdown-item" href="#">Users</a></li>
+          <li><a class="dropdown-item" href="{% url 'users' %}">Users</a></li>
         </ul>
       </li>
 
@@ -86,11 +86,11 @@
     <ul class="nav nav-pills flex-column mt-auto">
       {% if user.is_authenticated %}
         <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#">{{ user.username }}</a>
+          <a class="nav-link dropdown-toggle text-warning" data-bs-toggle="dropdown" href="#">{{ user.username }}</a>
           <ul class="dropdown-menu">
-            <li><a class="dropdown-item" href="#">Profile</a></li>
+            <li><a class="dropdown-item text-warning" href="#">Profile</a></li>
             <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item text-danger" href="{% url 'logout' %}">Logout</a></li>
+            <li><a class="dropdown-item text-warning" href="{% url 'logout' %}">Logout</a></li>
           </ul>
         </li>
       {% else %}
