@@ -24,8 +24,13 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', lambda request: redirect('login')),
     path('login/', auth_views.LoginView.as_view(template_name='accounts/login.html'), name='login'),
-     path('logout/', account_views.logoutUser, name="logout"),
+    path('logout/', account_views.logoutUser, name="logout"),
     path('register/', account_views.register, name='register'),
     path('dashboard/', account_views.dashboard, name='dashboard'),
     path('users/', account_views.users_list, name='users'),
+    path('new-user/', account_views.addUser, name='new-user'),
+    path('users/<int:user_id>/edit/', account_views.editUser, name='edit-user'),
+    path('users/<int:user_id>/delete/', account_views.deleteUser, name='delete-user'),
+    path('my-profile/edit/', account_views.edit_my_profile, name='update-profile'),
+   
 ]

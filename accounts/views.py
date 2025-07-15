@@ -4,6 +4,10 @@ from .forms import CreateUserForm
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
 from .models import User
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib.auth.decorators import user_passes_test
+from .forms import UpdateUserForm
+from .forms import EditMyProfileForm
 
 def register(request):
     form = CreateUserForm()
@@ -27,3 +31,47 @@ def logoutUser(request):
 def users_list(request):
     users = User.objects.all()
     return render(request, 'accounts/users.html', {'users': users})
+
+@login_required
+def addUser(request):
+    if request.method == 'POST':
+        form = CreateUserForm(request.POST)
+        if form.is_valid():
+            user = form.save(commit=False)
+            user.is_staff = form.cleaned_data['is_staff']  # Set admin flag
+            user.save()
+            messages.success(request, 'User created successfully.')
+            return redirect('users')
+    else:
+        form = CreateUserForm()
+    return render(request, 'accounts/new_user.html', {'form': form})
+
+@user_passes_test(lambda u: u.is_staff)
+def editUser(request, user_id):
+    user_obj = get_object_or_404(User, pk=user_id)
+    form = UpdateUserForm(request.POST or None, instance=user_obj)
+    if request.method == 'POST' and form.is_valid():
+        form.save()
+        return redirect('users') 
+    return render(request, 'accounts/edit_user.html', {'form': form, 'user_obj': user_obj})
+
+@user_passes_test(lambda u: u.is_staff)
+def deleteUser(request, user_id):
+    user_obj = get_object_or_404(User, pk=user_id)
+    if request.method == "POST":
+        user_obj.delete()
+        return redirect('users') 
+    return render(request, 'accounts/confirm_delete_user.html', {'user_obj': user_obj})
+
+@login_required
+def edit_my_profile(request):
+    user = request.user
+    if request.method == 'POST':
+        form = EditMyProfileForm(request.POST, instance=user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Your profile has been updated.')
+            return redirect('edit_profile')
+    else:
+        form = EditMyProfileForm(instance=user)
+    return render(request, 'accounts/edit_profile.html', {'form': form})

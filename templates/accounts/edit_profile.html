@@ -1,0 +1,30 @@
+{% extends 'base/main.html' %}
+{% load static %}
+{% block content %}
+<div class="container mt-5" style="max-width: 600px;">
+  <div class="card shadow rounded-4">
+    <div class="card-header bg-primary text-white">
+      <h4 class="mb-0">Edit My Profile</h4>
+    </div>
+    <div class="card-body">
+      <form method="POST">
+        {% csrf_token %}
+        {% for field in form %}
+          <div class="mb-3">
+            <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+            {{ field }}
+            <script>document.getElementById("{{ field.id_for_label }}").classList.add("form-control");</script>
+            {% for error in field.errors %}
+              <div class="text-danger small">{{ error }}</div>
+            {% endfor %}
+          </div>
+        {% endfor %}
+        <div class="d-flex justify-content-between">
+          <button type="submit" class="btn btn-success">Save Changes</button>
+         
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

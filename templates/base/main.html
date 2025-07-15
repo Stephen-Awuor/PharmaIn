@@ -23,7 +23,7 @@
     }
 
     .sidebar .nav-link.active {
-      background-color: rgba(255,255,255,0.1);
+      background-color: rgba(241, 17, 17, 0.925);
     }
 
     .main-content {
@@ -51,18 +51,18 @@
     <h4 class="mb-4">PharmaIn</h4>
 
     <ul class="nav nav-pills flex-column mb-auto">
-
+      {% if request.user.is_staff %}
       <li class="nav-item dropdown">
         <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#">Accounts</a>
         <ul class="dropdown-menu">
           <li><a class="dropdown-item" href="{% url 'users' %}">Users</a></li>
         </ul>
       </li>
-
+     
       <li class="nav-item">
         <a class="nav-link" href="#">Inventory</a>
       </li>
-
+ {% endif %}
       <li class="nav-item">
         <a class="nav-link" href="#">Suppliers</a>
       </li>
@@ -88,7 +88,7 @@
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle text-warning" data-bs-toggle="dropdown" href="#">{{ user.username }}</a>
           <ul class="dropdown-menu">
-            <li><a class="dropdown-item text-warning" href="#">Profile</a></li>
+            <li><a class="dropdown-item text-warning" href="{% url 'update-profile' %}">My Details</a></li>
             <li><hr class="dropdown-divider"></li>
             <li><a class="dropdown-item text-warning" href="{% url 'logout' %}">Logout</a></li>
           </ul>

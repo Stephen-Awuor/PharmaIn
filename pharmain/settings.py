@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'inventory',
     'sales',
     'suppliers',
+    'widget_tweaks',
 ]
 
 MIDDLEWARE = [
