@@ -1,4 +1,89 @@
 {% extends 'base/main.html' %}
+
 {% block content %}
-  <h2>Welcome to the PharmaIn Dashboard</h2>
+<h2 class="mb-4">Point of Sale</h2>
+
+<div class="row">
+  <!-- Left: Product Search -->
+  <div class="col-md-5">
+    <div class="card">
+      <div class="card-header bg-primary text-white">
+        Search Medicine
+      </div>
+      <div class="card-body">
+        <input type="text" class="form-control mb-3" placeholder="Search by name or code...">
+
+        <!-- Dummy product list -->
+        <ul class="list-group">
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            Panadol 500mg
+            <button class="btn btn-sm btn-success">Add</button>
+          </li>
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            Amoxicillin 250mg
+            <button class="btn btn-sm btn-success">Add</button>
+          </li>
+          <!-- Add more medicines here -->
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right: Cart -->
+  <div class="col-md-7">
+    <div class="card">
+      <div class="card-header bg-primary text-white">
+        Cart / Bill Preview
+      </div>
+      <div class="card-body">
+        <table class="table table-bordered">
+          <thead>
+            <tr>
+              <th>Item</th>
+              <th>Qty</th>
+              <th>Price</th>
+              <th>Total</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Panadol 500mg</td>
+              <td>2</td>
+              <td>20</td>
+              <td>40</td>
+              <td><button class="btn btn-danger btn-sm">Remove</button></td>
+            </tr>
+            <!-- More cart items -->
+          </tbody>
+        </table>
+
+        <div class="mb-3 row">
+          <label class="col-sm-4 col-form-label">Discount</label>
+          <div class="col-sm-8">
+            <input type="text" class="form-control" placeholder="e.g. 10%">
+          </div>
+        </div>
+
+        <hr>
+        <p><strong>Subtotal:</strong> KES 100</p>
+        <p><strong>VAT:</strong> KES 16</p>
+        <p><strong>Total:</strong> KES 116</p>
+
+        <div class="mb-3">
+          <label for="paymentMethod" class="form-label">Payment Method</label>
+          <select class="form-select" id="paymentMethod">
+            <option>Cash</option>
+            <option>M-PESA</option>
+            <option>Card</option>
+            <option>NHIF</option>
+          </select>
+        </div>
+
+        <button class="btn btn-primary">Finish</button>
+        <button class="btn btn-secondary">Print Receipt</button>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}
