@@ -2,6 +2,9 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.forms import AuthenticationForm
 from .models import User
+from django.contrib.auth.forms import PasswordChangeForm
+
+
 
 class CreateUserForm(UserCreationForm):
     is_staff = forms.BooleanField(required=False, label="Is Admin?")
@@ -48,9 +51,38 @@ class UpdateUserForm(forms.ModelForm):
         return user
     
 class EditMyProfileForm(forms.ModelForm):
+    new_password = forms.CharField(
+        label='New Password',
+        widget=forms.PasswordInput(attrs={'class': 'form-control'}),
+        required=False
+    )
+    confirm_password = forms.CharField(
+        label='Confirm New Password',
+        widget=forms.PasswordInput(attrs={'class': 'form-control'}),
+        required=False
+    )
+
     class Meta:
         model = User
-        fields = ['first_name', 'last_name', 'email']   
+        fields = ['first_name', 'last_name', 'email', 'new_password', 'confirm_password']
+
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)
+        super(EditMyProfileForm, self).__init__(*args, **kwargs)
+
+        # Debug print (temporary)
+        print("User is staff:", user.is_staff if user else 'no user')
+
+        for field in self.fields.values():
+            field.widget.attrs['class'] = 'form-control'
+
+        # Only make read-only for non-admins
+        if user and not user.is_staff:
+            self.fields['first_name'].widget.attrs['readonly'] = True
+            self.fields['last_name'].widget.attrs['readonly'] = True
+            self.fields['email'].widget.attrs['readonly'] = True
+
+
 
 
 

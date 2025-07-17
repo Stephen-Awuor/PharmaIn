@@ -4,25 +4,48 @@
 <div class="container mt-5" style="max-width: 600px;">
   <div class="card shadow rounded-4">
     <div class="card-header bg-primary text-white">
-      <h4 class="mb-0">Edit My Profile</h4>
+      <h4 class="mb-0">My Profile</h4>
     </div>
     <div class="card-body">
       <form method="POST">
         {% csrf_token %}
-        {% for field in form %}
-          <div class="mb-3">
-            <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
-            {{ field }}
-            <script>document.getElementById("{{ field.id_for_label }}").classList.add("form-control");</script>
-            {% for error in field.errors %}
-              <div class="text-danger small">{{ error }}</div>
-            {% endfor %}
-          </div>
-        {% endfor %}
-        <div class="d-flex justify-content-between">
-          <button type="submit" class="btn btn-primary">Save</button>
-         
+
+        <!-- Render first_name, last_name, email directly from form -->
+        <div class="mb-3">
+          <label for="{{ form.first_name.id_for_label }}" class="form-label">First Name</label>
+          {{ form.first_name }}
         </div>
+        <div class="mb-3">
+          <label for="{{ form.last_name.id_for_label }}" class="form-label">Last Name</label>
+          {{ form.last_name }}
+        </div>
+        <div class="mb-3">
+          <label for="{{ form.email.id_for_label }}" class="form-label">Email</label>
+          {{ form.email }}
+        </div>
+
+        <!-- Password Fields -->
+        <div class="mb-3">
+          <label for="{{ form.new_password.id_for_label }}" class="form-label">New Password</label>
+          {{ form.new_password }}
+          {% for error in form.new_password.errors %}
+            <div class="text-danger small">{{ error }}</div>
+          {% endfor %}
+        </div>
+        <div class="mb-3">
+          <label for="{{ form.confirm_password.id_for_label }}" class="form-label">Confirm New Password</label>
+          {{ form.confirm_password }}
+          {% for error in form.confirm_password.errors %}
+            <div class="text-danger small">{{ error }}</div>
+          {% endfor %}
+        </div>
+
+        <!-- Submit -->
+        <div class="d-flex justify-content-between">
+          <button type="submit" class="btn btn-primary px-4">Save</button>
+          <a href="{% url 'dashboard' %}" class="btn btn-primary px-4">Cancel</a>
+        </div>
+
       </form>
     </div>
   </div>

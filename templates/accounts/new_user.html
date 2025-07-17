@@ -1,9 +1,10 @@
 
 {% extends 'base/main.html' %}
+
 {% block content %}
 
-  <div class="register-container">
-    <h2 class="form-title">Add New User</h2>
+  <div class="container mt-5" style="max-width: 600px;">
+    <h2 class="form-title">Add User</h2>
     <form class="form" action="" method="POST">
       {% csrf_token %}
 
@@ -45,7 +46,7 @@
         {{ form.is_staff }}
     </div>
 
-      <button type="submit" class="btn btn-primary w-100">Add</button>
+      <button type="submit" class="btn btn-primary px-4">Add</button>
     </form>
 
     {% if form.errors %}

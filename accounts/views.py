@@ -66,12 +66,21 @@ def deleteUser(request, user_id):
 @login_required
 def edit_my_profile(request):
     user = request.user
+
     if request.method == 'POST':
-        form = EditMyProfileForm(request.POST, instance=user)
+        form = EditMyProfileForm(request.POST, instance=user, user=user)  # <-- user passed here
         if form.is_valid():
+            new_password = form.cleaned_data.get('new_password')
+            if new_password:
+                user.set_password(new_password)
             form.save()
             messages.success(request, 'Your profile has been updated.')
+            if new_password:
+                return redirect('login')
             return redirect('edit_profile')
     else:
-        form = EditMyProfileForm(instance=user)
+        form = EditMyProfileForm(instance=user, user=user)  # <-- and here
+
     return render(request, 'accounts/edit_profile.html', {'form': form})
+
+
