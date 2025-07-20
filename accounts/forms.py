@@ -1,16 +1,12 @@
 from django import forms
-from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from .models import User
-from django.contrib.auth.forms import PasswordChangeForm
-
-
 
 class CreateUserForm(UserCreationForm):
     is_staff = forms.BooleanField(required=False, label="Is Admin?")
     class Meta:
         model = User
-        fields = ['first_name', 'last_name', 'email', 'phone_number', 'username', 'password1', 'password2', 'is_staff']
+        fields = ['first_name', 'last_name', 'email', 'phone_number', 'password1', 'password2', 'is_staff']
 
 class EmailLoginForm(AuthenticationForm):
     username = forms.EmailField(label="Email", widget=forms.EmailInput(attrs={'class': 'form-control'}))
@@ -31,7 +27,7 @@ class UpdateUserForm(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = ['first_name', 'last_name', 'email', 'phone_number', 'username', 'is_staff']
+        fields = ['first_name', 'last_name', 'email', 'phone_number', 'is_staff']
 
     def clean(self):
         cleaned_data = super().clean()
@@ -81,7 +77,6 @@ class EditMyProfileForm(forms.ModelForm):
             self.fields['first_name'].widget.attrs['readonly'] = True
             self.fields['last_name'].widget.attrs['readonly'] = True
             self.fields['email'].widget.attrs['readonly'] = True
-
 
 
 

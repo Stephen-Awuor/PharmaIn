@@ -1,13 +1,12 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from .forms import CreateUserForm  
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
 from .models import User
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import user_passes_test
-from .forms import UpdateUserForm
-from .forms import EditMyProfileForm
+from .forms import CreateUserForm, UpdateUserForm, EditMyProfileForm
+
 
 def register(request):
     form = CreateUserForm()
@@ -52,6 +51,7 @@ def editUser(request, user_id):
     form = UpdateUserForm(request.POST or None, instance=user_obj)
     if request.method == 'POST' and form.is_valid():
         form.save()
+        messages.success(request, 'Changes successfully saved')
         return redirect('users') 
     return render(request, 'accounts/edit_user.html', {'form': form, 'user_obj': user_obj})
 
