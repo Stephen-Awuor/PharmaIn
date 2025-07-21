@@ -23,5 +23,8 @@ from inventory import views as views
 urlpatterns = [
     path('', views.index, name='index'),  # handles root '/'
     path('add-stock/', views.add_stock, name='add-stock'),
+    path('all-stock/', views.show_stock, name='all-stock'),
+    path('stockitem/<int:stockitem_id>/edit/', views.edit_stock, name='edit-stock'),
+    path('stockitem/<int:stockitem_id>/delete/', views.delete_stock, name='delete-stock'),
     # other inventory routes...
 ]

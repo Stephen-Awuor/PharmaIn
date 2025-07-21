@@ -129,8 +129,9 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-LOGIN_REDIRECT_URL = '/dashboard/'  
+LOGIN_URL = 'login'  
 LOGOUT_REDIRECT_URL = 'login'
+LOGIN_REDIRECT_URL = '/dashboard/'  # ✅ THIS is what was missing
 
 AUTH_USER_MODEL = 'accounts.User'  
 
