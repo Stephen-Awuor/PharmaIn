@@ -26,5 +26,11 @@ urlpatterns = [
     path('all-stock/', views.show_stock, name='all-stock'),
     path('stockitem/<int:stockitem_id>/edit/', views.edit_stock, name='edit-stock'),
     path('stockitem/<int:stockitem_id>/delete/', views.delete_stock, name='delete-stock'),
+    path('pos/', views.pos_view, name='pos'),
+    path('pos/search/', views.pos_search, name='pos_search'),
+   path('complete-sale/', views.complete_sale, name='pos_finish'),
+
+
+
     # other inventory routes...
 ]

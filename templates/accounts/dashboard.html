@@ -4,39 +4,38 @@
 <h2 class="mb-4">Point of Sale</h2>
 
 <div class="row">
-  <!-- Left: Product Search -->
+  <!-- Search Panel -->
   <div class="col-md-5">
     <div class="card">
       <div class="card-header bg-primary text-white">
         Search Medicine
       </div>
       <div class="card-body">
-        <input type="text" class="form-control mb-3" placeholder="Search by name or code...">
-
-        <!-- Dummy product list -->
-        <ul class="list-group">
-          <li class="list-group-item d-flex justify-content-between align-items-center">
-            Panadol 500mg
-            <button class="btn btn-sm btn-success">Add</button>
+        <input type="text" id="search-input" class="form-control" placeholder="Search medicine by name">
+        <div id="search-results" class="mt-2"></div>
+        <ul class="list-group mt-3" id="productList">
+          {% for product in products %}
+          <li class="list-group-item product-item d-flex justify-content-between align-items-center">
+            <span class="product-name">{{ product.product_name }} - KES {{ product.selling_price }}</span>
+            <button class="btn btn-sm btn-success add-to-cart-btn"
+              data-id="{{ product.id }}"
+              data-name="{{ product.product_name }}"
+              data-price="{{ product.selling_price }}">Add</button>
           </li>
-          <li class="list-group-item d-flex justify-content-between align-items-center">
-            Amoxicillin 250mg
-            <button class="btn btn-sm btn-success">Add</button>
-          </li>
-          <!-- Add more medicines here -->
+          {% endfor %}
         </ul>
       </div>
     </div>
   </div>
 
-  <!-- Right: Cart -->
+  <!-- Cart Panel -->
   <div class="col-md-7">
     <div class="card">
       <div class="card-header bg-primary text-white">
         Cart / Bill Preview
       </div>
       <div class="card-body">
-        <table class="table table-bordered">
+        <table class="table table-bordered" id="cartTable">
           <thead>
             <tr>
               <th>Item</th>
@@ -46,39 +45,12 @@
               <th>Action</th>
             </tr>
           </thead>
-          <tbody>
-            <tr>
-              <td>Panadol 500mg</td>
-              <td>2</td>
-              <td>20</td>
-              <td>40</td>
-              <td><button class="btn btn-danger btn-sm">Remove</button></td>
-            </tr>
-            <!-- More cart items -->
-          </tbody>
+          <tbody></tbody>
         </table>
 
-        <div class="mb-3 row">
-          <label class="col-sm-4 col-form-label">Discount</label>
-          <div class="col-sm-8">
-            <input type="text" class="form-control" placeholder="e.g. 10%">
-          </div>
-        </div>
-
-        <hr>
-        <p><strong>Subtotal:</strong> KES 100</p>
-        <p><strong>VAT:</strong> KES 16</p>
-        <p><strong>Total:</strong> KES 116</p>
-
-        <div class="mb-3">
-          <label for="paymentMethod" class="form-label">Payment Method</label>
-          <select class="form-select" id="paymentMethod">
-            <option>Cash</option>
-            <option>M-PESA</option>
-            <option>Card</option>
-            <option>NHIF</option>
-          </select>
-        </div>
+        <p><strong>Subtotal:</strong> KES <span id="subtotal">0.00</span></p>
+        <p><strong>VAT (16%):</strong> KES <span id="vat">0.00</span></p>
+        <p><strong>Total:</strong> KES <span id="total">0.00</span></p>
 
         <button class="btn btn-primary">Finish</button>
         <button class="btn btn-secondary">Print Receipt</button>
@@ -86,4 +58,144 @@
     </div>
   </div>
 </div>
+
+<!-- Script -->
+<script>
+$(document).ready(function () {
+    function updateTotals() {
+        let subtotal = 0;
+        $('#cartTable tbody tr').each(function () {
+            let total = parseFloat($(this).find('.item-total').text());
+            subtotal += total;
+        });
+        let vat = subtotal * 0.16;
+        let total = subtotal + vat;
+        $('#subtotal').text(subtotal.toFixed(2));
+        $('#vat').text(vat.toFixed(2));
+        $('#total').text(total.toFixed(2));
+    }
+
+    function addToCart(id, name, price) {
+        let exists = false;
+        $('#cartTable tbody tr').each(function () {
+            let row = $(this);
+            if (row.data('id') == id) {
+                let qty = parseInt(row.find('.qty').val()) + 1;
+                row.find('.qty').val(qty);
+                row.find('.item-total').text((qty * price).toFixed(2));
+                exists = true;
+            }
+        });
+
+        if (!exists) {
+            $('#cartTable tbody').append(`
+                <tr data-id="${id}">
+                    <td class="item-name">${name}</td>
+                    <td><input type="number" class="form-control qty item-qty" value="1" min="1" style="width: 70px;"></td>
+                    <td class="item-price">${price.toFixed(2)}</td>
+                    <td class="item-total">${price.toFixed(2)}</td>
+                    <td><button class="btn btn-sm btn-danger remove-btn">Remove</button></td>
+                </tr>
+            `);
+        }
+
+        updateTotals();
+    }
+
+    // Handle real-time search
+    $('#search-input').on('input', function () {
+        let query = $(this).val();
+        if (query.length > 1) {
+            $.ajax({
+                url: "{% url 'pos_search' %}",
+                data: { 'q': query },
+                success: function (data) {
+                    $('#search-results').empty();
+                    if (data.results.length > 0) {
+                        data.results.forEach(function (item) {
+                            $('#search-results').append(`
+                                <div class="card mt-2 p-2">
+                                    <div><strong>${item.product_name}</strong> - KES ${item.selling_price}</div>
+                                    <button class="btn btn-sm btn-success mt-1 add-to-cart-btn"
+                                        data-id="${item.id}"
+                                        data-name="${item.product_name}"
+                                        data-price="${item.selling_price}">
+                                        Add
+                                    </button>
+                                </div>
+                            `);
+                        });
+                    } else {
+                        $('#search-results').html('<p>No results found.</p>');
+                    }
+                }
+            });
+        } else {
+            $('#search-results').empty();
+        }
+    });
+
+    // Add to cart
+    $(document).on('click', '.add-to-cart-btn', function () {
+        let id = $(this).data('id');
+        let name = $(this).data('name');
+        let price = parseFloat($(this).data('price'));
+        addToCart(id, name, price);
+    });
+
+    // Remove from cart
+    $(document).on('click', '.remove-btn', function () {
+        $(this).closest('tr').remove();
+        updateTotals();
+    });
+
+    // Update total on quantity change
+    $(document).on('input', '.qty', function () {
+        let row = $(this).closest('tr');
+        let price = parseFloat(row.find('.item-price').text());
+        let qty = parseInt($(this).val()) || 1;
+        row.find('.item-total').text((qty * price).toFixed(2));
+        updateTotals();
+    });
+
+    // 🔥 Finish Sale
+    $('.btn-primary').on('click', function () {
+        let cartItems = [];
+        $('#cartTable tbody tr').each(function () {
+            let row = $(this);
+            cartItems.push({
+                id: row.data('id'),
+                name: row.find('.item-name').text(),
+                quantity: parseInt(row.find('.qty').val()),
+                price: parseFloat(row.find('.item-price').text())
+            });
+        });
+
+        if (cartItems.length === 0) {
+            alert("Cart is empty!");
+            return;
+        }
+
+        $.ajax({
+            url: "{% url 'pos_finish' %}",
+            method: "POST",
+            headers: { "X-CSRFToken": "{{ csrf_token }}" },
+            data: {
+                items: JSON.stringify(cartItems)
+            },
+            success: function (data) {
+                alert("Sale completed!");
+                $('#cartTable tbody').empty();
+                $('#subtotal').text("0.00");
+                $('#vat').text("0.00");
+                $('#total').text("0.00");
+            },
+            error: function () {
+                alert("Something went wrong. Please try again.");
+            }
+        });
+    });
+});
+</script>
+
 {% endblock %}
