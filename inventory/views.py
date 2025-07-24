@@ -62,68 +62,6 @@ def delete_stock(request, stockitem_id):
         return redirect('all-stock') 
     return render(request, 'inventory/confirm_delete_stock.html', {'stockitem_obj': stockitem_obj})
 
-
-@csrf_exempt
-def pos_search(request):
-    query = request.GET.get('q', '')
-    results = []
-    if query:
-        items = StockItem.objects.filter(product_name__icontains=query)
-        for item in items:
-            results.append({
-                'id': item.id,
-                'product_name': item.product_name,
-                'selling_price': str(item.selling_price)
-            })
-    return JsonResponse({'results': results})
-def pos_view(request):
-    products = StockItem.objects.all()
-    return render(request, 'your_pos_template.html', {'products': products})
-
-@csrf_exempt
-@login_required
-def complete_sale(request):
-    if request.method == 'POST':
-        data = json.loads(request.body)
-        cart_items = data.get('cartItems', [])
-        total = data.get('total', 0)
-        if not cart_items:
-            return JsonResponse({'error': 'Cart is empty'}, status=400)
-
-        sale = Sale.objects.create(
-            total=total,
-            cashier=request.user
-        )
-
-        for item in cart_items:
-            product_id = item.get('productId')
-            quantity = item.get('quantity')
-            price = item.get('price')
-
-            try:
-                product = StockItem.objects.get(id=product_id)
-                if product.quantity < quantity:
-                    return JsonResponse({'error': f"Not enough stock for {product.product_name}"}, status=400)
-
-                # Deduct stock
-                product.quantity -= quantity
-                product.save()
-
-                # Save the sale item
-                SaleItem.objects.create(
-                    sale=sale,
-                    product=product,
-                    quantity=quantity,
-                    price=price
-                )
-
-            except StockItem.DoesNotExist:
-                return JsonResponse({'error': 'Product not found'}, status=404)
-
-        return JsonResponse({'message': 'Sale completed successfully'})
-
-    return JsonResponse({'error': 'Invalid request method'}, status=405)
-
 @login_required
 def all_suppliers(request):
     suppliers = Supplier.objects.all()
@@ -162,5 +100,63 @@ def delete_supplier(request, supplier_id):
         return redirect('suppliers') 
     return render(request, 'inventory/confirm_delete_supplier.html', {'supplier_obj': supplier_obj})
 
+@csrf_exempt
+def pos_search(request):
+    query = request.GET.get('q', '')
+    results = []
+    if query:
+        items = StockItem.objects.filter(product_name__icontains=query)
+        for item in items:
+            results.append({
+                'id': item.id,
+                'product_name': item.product_name,
+                'selling_price': str(item.selling_price)
+            })
+    return JsonResponse({'results': results})
+def pos_view(request):
+    products = StockItem.objects.all()
+    return render(request, 'your_pos_template.html', {'products': products})
 
+@csrf_exempt
+@login_required
+def complete_sale(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            cart_items = data.get('cartItems', [])
+            total = data.get('total', 0)
 
+            if not cart_items:
+                return JsonResponse({'error': 'Cart is empty'}, status=400)
+
+            sale = Sale.objects.create(total=total, cashier=request.user)
+
+            for item in cart_items:
+                product_id = item.get('id')  
+                quantity = item.get('quantity')
+                price = item.get('price')
+
+                try:
+                    product = StockItem.objects.get(id=product_id)
+                    if product.quantity < quantity:
+                        return JsonResponse({'error': f"Not enough stock for {product.product_name}"}, status=400)
+
+                    product.quantity -= quantity
+                    product.save()
+
+                    SaleItem.objects.create(
+                        sale=sale,
+                        product=product,
+                        quantity=quantity,
+                        price=price
+                    )
+
+                except StockItem.DoesNotExist:
+                    return JsonResponse({'error': 'Product not found'}, status=404)
+
+            return JsonResponse({'message': 'Sale completed successfully'})
+
+        except json.JSONDecodeError as e:
+            return JsonResponse({'error': 'Invalid JSON'}, status=400)
+
+    return JsonResponse({'error': 'Invalid request method'}, status=405)
