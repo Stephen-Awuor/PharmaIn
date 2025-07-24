@@ -66,7 +66,6 @@ def deleteUser(request, user_id):
 @login_required
 def edit_my_profile(request):
     user = request.user
-
     if request.method == 'POST':
         form = EditMyProfileForm(request.POST, instance=user, user=user)  # <-- user passed here
         if form.is_valid():
@@ -82,5 +81,3 @@ def edit_my_profile(request):
         form = EditMyProfileForm(instance=user, user=user)  # <-- and here
 
     return render(request, 'accounts/edit_profile.html', {'form': form})
-
-

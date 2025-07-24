@@ -34,6 +34,12 @@ urlpatterns = [
     path('users/<int:user_id>/edit/', account_views.editUser, name='edit-user'),
     path('users/<int:user_id>/delete/', account_views.deleteUser, name='delete-user'),
     path('my-profile/edit/', account_views.edit_my_profile, name='update-profile'),
+   
+    # Password reset routes
+    path('password-reset/', auth_views.PasswordResetView.as_view(template_name='accounts/password_reset.html'), name='password_reset'),
+    path('password-reset/done/', auth_views.PasswordResetDoneView.as_view(template_name='accounts/password_reset_done.html'), name='password_reset_done'),
+    path('reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(template_name='accounts/password_reset_confirm.html'), name='password_reset_confirm'),
+    path('reset/done/', auth_views.PasswordResetCompleteView.as_view(template_name='accounts/password_reset_complete.html'), name='password_reset_complete'),
 
     # Inventory routes (use root path for clean URLs)
     path('', include('inventory.urls')),

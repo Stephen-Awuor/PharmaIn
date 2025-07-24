@@ -1,8 +1,8 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from .forms import StockForm
+from .forms import StockForm, SupplierForm
 from django.contrib.auth.decorators import login_required
-from .models import StockItem, Sale, SaleItem
+from .models import StockItem, Sale, SaleItem, Supplier
 from django.contrib.auth.decorators import user_passes_test
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import JsonResponse
@@ -10,6 +10,7 @@ from django.views.decorators.csrf import csrf_exempt
 import json
 from django.contrib.auth import get_user_model
 User = get_user_model()
+from django.core.paginator import Paginator
 
 
 @login_required
@@ -35,8 +36,13 @@ def add_stock(request):
 
 @login_required
 def show_stock(request):
-    stockitems = StockItem.objects.all()
-    return render(request, 'inventory/all_stock.html', {'stockitems': stockitems})
+    stockitems = StockItem.objects.all().order_by('-added_on')  # adjust as needed
+    paginator = Paginator(stockitems, 50)  # Show 10 stocks per page
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    return render(request, 'inventory/all_stock.html', {
+        'page_obj': page_obj,
+    })
 
 @user_passes_test(lambda u: u.is_staff)
 def edit_stock(request, stockitem_id):
@@ -70,7 +76,6 @@ def pos_search(request):
                 'selling_price': str(item.selling_price)
             })
     return JsonResponse({'results': results})
-
 def pos_view(request):
     products = StockItem.objects.all()
     return render(request, 'your_pos_template.html', {'products': products})
@@ -82,7 +87,6 @@ def complete_sale(request):
         data = json.loads(request.body)
         cart_items = data.get('cartItems', [])
         total = data.get('total', 0)
-
         if not cart_items:
             return JsonResponse({'error': 'Cart is empty'}, status=400)
 
@@ -119,3 +123,44 @@ def complete_sale(request):
         return JsonResponse({'message': 'Sale completed successfully'})
 
     return JsonResponse({'error': 'Invalid request method'}, status=405)
+
+@login_required
+def all_suppliers(request):
+    suppliers = Supplier.objects.all()
+    return render(request, 'inventory/suppliers.html', {'suppliers': suppliers})
+
+@login_required
+def add_supplier(request):
+    if request.method == 'POST':
+        form = SupplierForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Supplier added successfully!")
+            return redirect('suppliers')  # or wherever you want
+        else:
+            messages.error(request, "Please correct the errors below.")
+    else:
+        form = SupplierForm()
+    
+    return render(request, 'inventory/add_supplier.html', {'form': form})
+
+@user_passes_test(lambda u: u.is_staff)
+def edit_supplier(request, supplier_id):
+    supplier_obj = get_object_or_404(Supplier, pk=supplier_id)
+    form = SupplierForm(request.POST or None, instance=supplier_obj)
+    if request.method == 'POST' and form.is_valid():
+        form.save()
+        messages.success(request, 'Changes successfully saved')
+        return redirect('suppliers') 
+    return render(request, 'inventory/edit_supplier.html', {'form': form, 'supplier_obj': supplier_obj})
+
+@user_passes_test(lambda u: u.is_staff)
+def delete_supplier(request, supplier_id):
+    supplier_obj = get_object_or_404(Supplier, pk=supplier_id)
+    if request.method == "POST":
+        supplier_obj.delete()
+        return redirect('suppliers') 
+    return render(request, 'inventory/confirm_delete_supplier.html', {'supplier_obj': supplier_obj})
+
+
+

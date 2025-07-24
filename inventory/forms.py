@@ -1,7 +1,7 @@
 # inventory/forms.py
 
 from django import forms
-from .models import StockItem
+from .models import StockItem, Supplier
 
 class StockForm(forms.ModelForm):
     class Meta:
@@ -21,3 +21,8 @@ class StockForm(forms.ModelForm):
                 'placeholder': 'Add any relevant notes (e.g. batch number, condition, etc.)'
             }),
         }
+
+class SupplierForm(forms.ModelForm):
+    class Meta:
+        model = Supplier
+        fields = ['name', 'contact_info']

@@ -176,26 +176,30 @@ $(document).ready(function () {
             return;
         }
 
-        $.ajax({
-            url: "{% url 'pos_finish' %}",
-            method: "POST",
-            headers: { "X-CSRFToken": "{{ csrf_token }}" },
-            data: {
-                items: JSON.stringify(cartItems)
-            },
-            success: function (data) {
-                alert("Sale completed!");
-                $('#cartTable tbody').empty();
-                $('#subtotal').text("0.00");
-                $('#vat').text("0.00");
-                $('#total').text("0.00");
-            },
-            error: function () {
-                alert("Something went wrong. Please try again.");
-            }
-        });
+       $.ajax({
+    url: "{% url 'pos_finish' %}",
+    method: "POST",
+    headers: {
+        "X-CSRFToken": "{{ csrf_token }}",
+        "Content-Type": "application/json"
+    },
+    data: JSON.stringify({
+        items: cartItems,
+        total: parseFloat($('#total').text())
+    }),
+    success: function (data) {
+        alert("Sale completed!");
+        $('#cartTable tbody').empty();
+        $('#subtotal').text("0.00");
+        $('#vat').text("0.00");
+        $('#total').text("0.00");
+    },
+    error: function () {
+        alert("Something went wrong. Please try again.");
+    }
+});
     });
 });
 </script>
-
+<!-- DEBUG -->
 {% endblock %}
