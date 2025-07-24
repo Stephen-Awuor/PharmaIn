@@ -207,11 +207,14 @@ $(document).ready(function () {
                 total: parseFloat($('#total').text())
             }),
             success: function (data) {
-                alert("Sale completed!");
-                $('#cartTable tbody').empty();
-                $('#subtotal').text("0.00");
-                $('#vat').text("0.00");
-                $('#total').text("0.00");
+                  alert("Sale completed!");
+                  $('#cartTable tbody').empty();
+                  $('#subtotal').text("0.00");
+                  $('#vat').text("0.00");
+                  $('#total').text("0.00");
+
+    // 🧾 Open receipt page
+             window.open(`/sales/receipt/${data.sale_id}/`, '_blank');
             },
             error: function () {
                 alert("Something went wrong. Please try again.");

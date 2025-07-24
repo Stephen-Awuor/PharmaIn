@@ -43,5 +43,6 @@ urlpatterns = [
 
     # Inventory routes (use root path for clean URLs)
     path('', include('inventory.urls')),
+    path('sales/', include('sales.urls')),
 ]
 

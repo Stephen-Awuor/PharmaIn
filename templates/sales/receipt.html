@@ -1,0 +1,33 @@
+{# templates/sales/receipt.html #}
+{% extends 'base/main.html' %}
+
+{% block content %}
+<div class="container mt-4">
+  <h3>🧾 Receipt</h3>
+
+  <p><strong>Date:</strong> {{ date|date:"d M Y, H:i" }}</p>
+
+  <table class="table table-sm">
+    <thead>
+      <tr>
+        <th>Product</th><th>Qty</th><th>Price</th><th>Total</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in items %}
+        <tr>
+          <td>{{ item.product.product_name }}</td>
+          <td>{{ item.quantity }}</td>
+          <td>{{ item.price }}</td>
+          <td>{{ item.get_total }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <hr>
+  <h5>Total Paid: KES {{ sale.total }}</h5>
+
+  <button onclick="window.print()" class="btn btn-secondary mt-3">Print</button>
+</div>
+{% endblock %}

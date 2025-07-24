@@ -19,6 +19,8 @@ from django.urls import path
 from django.shortcuts import redirect
 from django.contrib.auth import views as auth_views
 from inventory import views as views
+from inventory import views as inventory_views
+from sales import views as sales_views
 
 
 urlpatterns = [
@@ -29,7 +31,6 @@ urlpatterns = [
     path('stockitem/<int:stockitem_id>/delete/', views.delete_stock, name='delete-stock'),
     path('pos/', views.pos_view, name='pos'),
     path('pos/search/', views.pos_search, name='pos_search'),
-    path('complete-sale/', views.complete_sale, name='pos_finish'),
     path('suppliers/', views.all_suppliers, name='suppliers'),
     path('add-new-supplier/', views.add_supplier, name='add-new-supplier'),
     path('edit-supplier-info/<int:supplier_id>/edit/', views.edit_supplier, name='edit-supplier-info'),
