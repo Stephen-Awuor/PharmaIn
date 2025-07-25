@@ -35,6 +35,10 @@ urlpatterns = [
     path('add-new-supplier/', views.add_supplier, name='add-new-supplier'),
     path('edit-supplier-info/<int:supplier_id>/edit/', views.edit_supplier, name='edit-supplier-info'),
     path('delete-supplier/<int:supplier_id>/edit/', views.delete_supplier, name='delete-supplier'),
+    path('categories/', views.stock_categories, name='categories'),
+    path('add-new-category/', views.add_category, name='add-new-category'),
+    path('edit-category-info/<int:category_id>/edit/', views.edit_category, name='edit-category-info'),
+    path('delete-category/<int:category_id>/edit/', views.delete_category, name='delete-category'),
 
     # other inventory routes...
 ]

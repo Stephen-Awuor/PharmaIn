@@ -1,8 +1,8 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from .forms import StockForm, SupplierForm
+from .forms import StockForm, SupplierForm, CategoryForm
 from django.contrib.auth.decorators import login_required
-from .models import StockItem, Supplier
+from .models import StockItem, Supplier, Category
 from sales.models import Sale, SaleItem
 from django.contrib.auth.decorators import user_passes_test
 from django.shortcuts import render, get_object_or_404, redirect
@@ -117,4 +117,43 @@ def pos_search(request):
 def pos_view(request):
     products = StockItem.objects.all()
     return render(request, 'your_pos_template.html', {'products': products})
+
+@login_required
+def stock_categories(request):
+    category = Category.objects.all()
+    return render(request, 'inventory/stock_category.html', {'category': category})
+
+@login_required
+def add_category(request):
+    if request.method == 'POST':
+        form = CategoryForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Category added successfully!")
+            return redirect('categories')  # or wherever you want
+        else:
+            messages.error(request, "Please correct the errors below.")
+    else:
+        form = CategoryForm()
+    return render(request, 'inventory/add_category.html', {'form': form})
+
+@user_passes_test(lambda u: u.is_staff)
+def edit_category(request, category_id):
+    category_obj = get_object_or_404(Category, pk=category_id)
+    form = CategoryForm(request.POST or None, instance=category_obj)
+    if request.method == 'POST' and form.is_valid():
+        form.save()
+        messages.success(request, 'Changes successfully saved')
+        return redirect('categories') 
+    return render(request, 'inventory/edit_category.html', {'form': form, 'category_obj': category_obj})
+
+@user_passes_test(lambda u: u.is_staff)
+def delete_category(request, category_id):
+    category_obj = get_object_or_404(Category, pk=category_id)
+    if request.method == "POST":
+        category_obj.delete()
+        return redirect('categories`') 
+    return render(request, 'inventory/confirm_delete_category.html', {'category_obj': category_obj})
+
+
 

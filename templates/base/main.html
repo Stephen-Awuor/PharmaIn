@@ -65,17 +65,13 @@
           {% if request.user.is_staff %}
           <li><a class="dropdown-item" href="{% url 'add-stock' %}">Add</a></li>
           <li><a class="dropdown-item" href="#">Stock Alerts</a></li>
-          <li><a class="dropdown-item" href="#">Categories</a></li>
+          <li><a class="dropdown-item" href="{% url 'categories' %}">Categories</a></li>
            {% endif %}
         </ul>
       </li>
 
       <li class="nav-item">
         <a class="nav-link" href="#">Customers</a>
-      </li>
-
-      <li class="nav-item">
-        <a class="nav-link" href="#">Prescriptions</a>
       </li>
 
       <li class="nav-item">

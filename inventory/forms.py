@@ -1,7 +1,7 @@
 # inventory/forms.py
 
 from django import forms
-from .models import StockItem, Supplier
+from .models import StockItem, Supplier, Category
 
 class StockForm(forms.ModelForm):
     class Meta:
@@ -26,3 +26,8 @@ class SupplierForm(forms.ModelForm):
     class Meta:
         model = Supplier
         fields = ['name', 'contact_info']
+
+class CategoryForm(forms.ModelForm):
+    class Meta:
+        model = Category
+        fields = ['name']
