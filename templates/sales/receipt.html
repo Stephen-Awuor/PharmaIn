@@ -3,6 +3,7 @@
 
 {% block content %}
 <div class="container mt-4">
+  <div id="printable-area">
   <h3>🧾 Receipt</h3>
 
   <p><strong>Date:</strong> {{ date|date:"d M Y, H:i" }}</p>
@@ -24,10 +25,9 @@
       {% endfor %}
     </tbody>
   </table>
-
   <hr>
   <h5>Total Paid: KES {{ sale.total }}</h5>
-
-  <button onclick="window.print()" class="btn btn-secondary mt-3">Print</button>
+  <button onclick="window.print()" class="btn btn-secondary">Print</button>
+  </div>
 </div>
 {% endblock %}

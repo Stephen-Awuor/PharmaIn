@@ -21,6 +21,9 @@ from django.contrib.auth import views as auth_views
 from inventory import views as views
 from inventory import views as inventory_views
 from sales import views as sales_views
+from .views import export_stock_to_excel
+from .views import export_supplier_to_excel
+from .views import export_category_to_excel
 
 
 urlpatterns = [
@@ -39,6 +42,9 @@ urlpatterns = [
     path('add-new-category/', views.add_category, name='add-new-category'),
     path('edit-category-info/<int:category_id>/edit/', views.edit_category, name='edit-category-info'),
     path('delete-category/<int:category_id>/edit/', views.delete_category, name='delete-category'),
+    path('export-stock/', export_stock_to_excel, name='export-stock'),
+    path('export-supplier/', export_supplier_to_excel, name='export-supplier'),
+    path('export-category/', export_category_to_excel, name='export-category'),
 
     # other inventory routes...
 ]

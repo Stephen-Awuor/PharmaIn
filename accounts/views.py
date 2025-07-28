@@ -6,6 +6,9 @@ from .models import User
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import user_passes_test
 from .forms import CreateUserForm, UpdateUserForm, EditMyProfileForm
+import openpyxl
+from openpyxl.utils import get_column_letter
+from django.http import HttpResponse
 
 
 def register(request):
@@ -81,3 +84,45 @@ def edit_my_profile(request):
         form = EditMyProfileForm(instance=user, user=user)  # <-- and here
 
     return render(request, 'accounts/edit_profile.html', {'form': form})
+
+def export_users_to_excel(request):
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = "Current Users"
+
+    # Define your headers
+    headers = ['First Name', 'Last Name', 'Email', 'Phone Number']
+    ws.append(headers)
+
+    # Query the data
+    users = User.objects.all()
+
+    for item in users:
+        ws.append([
+            item.first_name,
+            item.last_name,  # adjust depending on your foreign key
+            item.phone_number,
+            item.email,
+        ])
+
+    # Auto width
+    for col in ws.columns:
+        max_length = 0
+        column = col[0].column
+        for cell in col:
+            try:
+                if len(str(cell.value)) > max_length:
+                    max_length = len(str(cell.value))
+            except:
+                pass
+        ws.column_dimensions[get_column_letter(column)].width = max_length + 2
+
+    # Create response
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename=Users.xlsx'
+    wb.save(response)
+    return response
+
+
+
+

@@ -12,6 +12,9 @@ import json
 from django.contrib.auth import get_user_model
 User = get_user_model()
 from django.core.paginator import Paginator
+import openpyxl
+from openpyxl.utils import get_column_letter
+from django.http import HttpResponse
 
 
 @login_required
@@ -154,6 +157,128 @@ def delete_category(request, category_id):
         category_obj.delete()
         return redirect('categories`') 
     return render(request, 'inventory/confirm_delete_category.html', {'category_obj': category_obj})
+
+def export_stock_to_excel(request):
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = "Current Stock"
+
+    # Define your headers
+    headers = ['Product Name', 'Supplier', 'Category', 'Quantity', 'Unit Price', 'Selling Price', 'Expiry Date', 'Notes', 'Date Created']
+    ws.append(headers)
+
+    # Query the data
+    stock_items = StockItem.objects.all()
+
+    for item in stock_items:
+        ws.append([
+            item.product_name,
+            item.supplier.name,  # adjust depending on your foreign key
+            item.category.name,
+            item.quantity,
+            item.unit_price,
+            item.selling_price,
+            item.expiry_date.strftime('%Y-%m-%d'),
+            item.notes,
+            item.added_on.strftime('%Y-%m-%d'),
+        ])
+
+    # Auto width
+    for col in ws.columns:
+        max_length = 0
+        column = col[0].column
+        for cell in col:
+            try:
+                if len(str(cell.value)) > max_length:
+                    max_length = len(str(cell.value))
+            except:
+                pass
+        ws.column_dimensions[get_column_letter(column)].width = max_length + 2
+
+    # Create response
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename=Stock.xlsx'
+    wb.save(response)
+    return response
+
+def export_supplier_to_excel(request):
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = "Current Suppliers"
+
+    # Define your headers
+    headers = ['Name', 'Contact Info']
+    ws.append(headers)
+
+    # Query the data
+    suppliers = Supplier.objects.all()
+
+    for item in suppliers:
+        ws.append([
+            item.name,
+            item.contact_info,    
+        ])
+
+    # Auto width
+    for col in ws.columns:
+        max_length = 0
+        column = col[0].column
+        for cell in col:
+            try:
+                if len(str(cell.value)) > max_length:
+                    max_length = len(str(cell.value))
+            except:
+                pass
+        ws.column_dimensions[get_column_letter(column)].width = max_length + 2
+
+    # Create response
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename=Suppliers.xlsx'
+    wb.save(response)
+    return response
+
+def export_category_to_excel(request):
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = "Stock Categories"
+
+    # Define your headers
+    headers = ['Name']
+    ws.append(headers)
+
+    # Query the data
+    category = Category.objects.all()
+
+    for item in category:
+        ws.append([
+            item.name, 
+        ])
+
+    # Auto width
+    for col in ws.columns:
+        max_length = 0
+        column = col[0].column
+        for cell in col:
+            try:
+                if len(str(cell.value)) > max_length:
+                    max_length = len(str(cell.value))
+            except:
+                pass
+        ws.column_dimensions[get_column_letter(column)].width = max_length + 2
+
+    # Create response
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename=Categories.xlsx'
+    wb.save(response)
+    return response
+
+
+
+
+
+
+
+
 
 
 

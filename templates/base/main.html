@@ -45,6 +45,32 @@
     .sidebar .dropdown-menu a:hover {
       background-color: rgba(255,255,255,0.1);
     }
+
+    @media print {
+  body * {
+    visibility: hidden;
+  }
+  .no-print {
+    display: none !important;
+  }
+
+  #printable-area, #printable-area * {
+    visibility: visible;
+  }
+
+  #printable-area {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    padding: 10px;
+    background: white;
+  }
+
+  button, .sidebar, nav, .pagination {
+    display: none !important;
+  }
+  }
   </style>
 </head>
 <body>
@@ -63,7 +89,6 @@
         <ul class="dropdown-menu">
           <li><a class="dropdown-item" href="{% url 'all-stock' %}">Current Stock</a></li>
           {% if request.user.is_staff %}
-          <li><a class="dropdown-item" href="{% url 'add-stock' %}">Add</a></li>
           <li><a class="dropdown-item" href="#">Stock Alerts</a></li>
           <li><a class="dropdown-item" href="{% url 'categories' %}">Categories</a></li>
            {% endif %}
