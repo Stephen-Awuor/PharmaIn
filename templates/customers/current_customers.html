@@ -1,0 +1,77 @@
+{% extends 'base/main.html' %}
+
+{% block content %}
+<div class="container mt-0">
+
+  <!-- Header and Action Buttons -->
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="mb-0">Current Customers</h2>
+    <div>
+      {% if request.user.is_staff %}
+      <a href="{% url 'add-customer' %}" class="btn btn-secondary me-2">Add</a>
+      {% endif %}
+      <button onclick="window.print()" class="btn btn-secondary me-2">Print</button>
+      <a href="#" class="btn btn-secondary">Export</a>
+    </div>
+  </div>
+
+  <!-- Printable Area -->
+  <div id="printable-area">
+    <table class="table table-bordered table-hover table-striped">
+      <thead class="table-primary">
+        <tr>
+          <th></th>
+          <th>First Name</th>
+          <th>Last Name</th>
+          <th>Email</th>
+          <th>Phone Number</th>
+          <th>Address</th>
+          <th>Notes (Allergies etc)</th>
+          {% if request.user.is_staff %}
+          <th class="no-print">Actions</th>
+          {% endif %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for customer in customers %}
+        <tr>
+          <td>{{ forloop.counter }}</td>
+          <td>{{ customer.first_name }}</td>
+          <td>{{ customer.last_name }}</td>
+          <td>{{ customer.email }}</td>
+          <td>{{ customer.phone_number }}</td>
+          <td>{{ customer.address }}</td>
+          <td>{{ customer.medical_notes }}</td>
+          {% if request.user.is_staff %}
+          <td class="no-print">
+            <a href="{% url 'edit-customer' customer.id %}" class="btn btn-sm btn-warning">Edit</a>
+            <a href="{% url 'delete-customer' customer.id %}" class="btn btn-sm btn-danger">Delete</a>
+          </td>
+          {% endif %}
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination Controls -->
+  <div class="pagination">
+    <span class="step-links">
+      {% if page_obj.has_previous %}
+      <a href="?page=1">&laquo; first</a>
+      <a href="?page={{ page_obj.previous_page_number }}">previous</a>
+      {% endif %}
+
+      <span class="current">
+        Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+      </span>
+
+      {% if page_obj.has_next %}
+      <a href="?page={{ page_obj.next_page_number }}">next</a>
+      <a href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
+      {% endif %}
+    </span>
+  </div>
+
+</div>
+{% endblock %}
