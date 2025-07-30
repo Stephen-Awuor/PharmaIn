@@ -15,7 +15,7 @@ from django.core.paginator import Paginator
 import openpyxl
 from openpyxl.utils import get_column_letter
 from django.http import HttpResponse
-
+from django.db.models import Q
 
 @login_required
 def index(request):
@@ -40,12 +40,20 @@ def add_stock(request):
 
 @login_required
 def show_stock(request):
+    query = request.GET.get('q', '')  # Default to empty string
     stockitems = StockItem.objects.all().order_by('-added_on')  # adjust as needed
-    paginator = Paginator(stockitems, 50)  # Show 10 stocks per page
+    if query:
+        stockitems = stockitems.filter(
+            Q(product_name__icontains=query) |
+            Q(supplier__name__icontains=query)
+            
+        )
+    paginator = Paginator(stockitems, 50)  # Show 50 stocks per page
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     return render(request, 'inventory/all_stock.html', {
         'page_obj': page_obj,
+        'query': query,
     })
 
 @user_passes_test(lambda u: u.is_staff)

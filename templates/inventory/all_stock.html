@@ -14,6 +14,13 @@
       <a href="{% url 'export-stock' %}" class="btn btn-secondary">Export</a>
     </div>
   </div>
+  <form method="get" action="" class="mb-3">
+  <div class="input-group">
+    <input type="text" name="q" class="form-control" placeholder="Search stock..." value="{{ query }}">
+    <button class="btn btn-primary" type="submit">Search</button>
+    <a href="{% url 'all-stock' %}" class="btn btn-outline-secondary ms-2">Clear</a>
+  </div>
+</form>
 
   <!-- Printable Area -->
   <div id="printable-area">
