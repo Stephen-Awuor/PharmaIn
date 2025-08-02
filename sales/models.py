@@ -4,8 +4,11 @@ from inventory.models import StockItem
 
 
 class Sale(models.Model):
-    date = models.DateTimeField(auto_now_add=True)
-    total = models.DecimalField(max_digits=10, decimal_places=2)
+    product = models.ForeignKey(StockItem, on_delete=models.CASCADE)
+    quantity_sold = models.PositiveIntegerField()
+    selling_price = models.DecimalField(max_digits=10, decimal_places=2)
+    total_amount = models.DecimalField(max_digits=10, decimal_places=2)
+    sold_on = models.DateTimeField(auto_now_add=True)
     cashier = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True)
 
     def __str__(self):
@@ -15,8 +18,8 @@ class Sale(models.Model):
 class SaleItem(models.Model):
     sale = models.ForeignKey(Sale, related_name='items', on_delete=models.CASCADE)
     product = models.ForeignKey(StockItem, on_delete=models.PROTECT)
-    quantity = models.PositiveIntegerField()
-    price = models.DecimalField(max_digits=10, decimal_places=2)
+    quantity_sold = models.PositiveIntegerField()
+    total_amount = models.DecimalField(max_digits=10, decimal_places=2)
 
     def get_total(self):
         return self.quantity * self.price

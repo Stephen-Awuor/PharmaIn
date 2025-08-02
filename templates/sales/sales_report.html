@@ -1,0 +1,52 @@
+<h2>Sales Report</h2>
+
+<!-- Filter Form -->
+<form method="get" class="row g-3 mb-4">
+  <div class="col-auto">
+    <input type="text" name="q" class="form-control" placeholder="Search product..." value="{{ query }}">
+  </div>
+  <div class="col-auto">
+    <input type="date" name="start_date" class="form-control" value="{{ start_date }}">
+  </div>
+  <div class="col-auto">
+    <input type="date" name="end_date" class="form-control" value="{{ end_date }}">
+  </div>
+  <div class="col-auto">
+    <button type="submit" class="btn btn-primary">Filter</button>
+  </div>
+</form>
+
+<!-- Sales Table -->
+<table class="table table-bordered table-hover">
+  <thead class="table-dark">
+    <tr>
+      <th>#</th>
+      <th>Product</th>
+      <th>Quantity Sold</th>
+      <th>Selling Price</th>
+      <th>Total</th>
+      <th>Date</th>
+      <th>Sold By</th>
+      
+    </tr>
+  </thead>
+  <tbody>
+    {% for sale in sales %}
+    <tr>
+      <td>{{ forloop.counter }}</td>
+      <td>{{ sale.product.product_name }}</td>
+      <td>{{ sale.quantity_sold }}</td>
+      <td>{{ sale.selling_price }}</td>
+      <td>{{ sale.total_amount }}</td>
+      <td>{{ sale.sold_on|date:"M d, Y H:i" }}</td>
+      <td>{{ sale.cashier }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<!-- Summary -->
+<div class="mt-4">
+  <p><strong>Total Items Sold:</strong> {{ total_items }}</p>
+  <p><strong>Total Revenue:</strong> KES {{ total_revenue }}</p>
+</div>
