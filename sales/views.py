@@ -6,6 +6,10 @@ from .models import Sale, SaleItem
 from inventory.models import StockItem
 import json
 from django.utils import timezone
+from django.db.models import Sum, F
+import openpyxl
+from openpyxl.utils import get_column_letter
+from django.http import HttpResponse
 
 # Create your views here.
 @csrf_exempt
@@ -20,7 +24,8 @@ def complete_sale(request):
             if not cart_items:
                 return JsonResponse({'error': 'Cart is empty'}, status=400)
 
-            sale = Sale.objects.create(total=total, cashier=request.user)
+            sale = Sale.objects.create(total_amount=total, cashier=request.user)
+
 
             for item in cart_items:
                 product_id = item.get('id')  
@@ -38,8 +43,8 @@ def complete_sale(request):
                     SaleItem.objects.create(
                         sale=sale,
                         product=product,
-                        quantity=quantity,
-                        price=price
+                        quantity_sold=quantity,
+                        total_amount=price * quantity
                     )
 
                 except StockItem.DoesNotExist:
@@ -58,9 +63,10 @@ def sale_receipt(request, sale_id):
 
     context = {
         'sale': sale,
-        'items': sale_items,          # keep the key name consistent with the template
-        'cashier': sale.cashier,      # <- use cashier, not user
-        'date': sale.date,            # <- your model field is `date`, not `created_at`
+        'items': sale_items,          
+        'cashier': sale.cashier,      
+        'date': sale.sold_on,
+          
     }
     return render(request, 'sales/receipt.html', context)
 
@@ -74,22 +80,75 @@ def sales_report(request):
     start_date = request.GET.get('start_date')
     end_date = request.GET.get('end_date')
 
-    sales = Sale.objects.all().order_by('-sold_on')
+    # Start from SaleItem instead of Sale
+    sale_items = SaleItem.objects.select_related('sale', 'product').order_by('-sale__sold_on')
 
     if start_date and end_date:
-        sales = sales.filter(sold_on__date__range=[start_date, end_date])
-    
-    if query:
-        sales = sales.filter(product__product_name__icontains=query)
+        sale_items = sale_items.filter(sale__sold_on__date__range=[start_date, end_date])
 
-    total_revenue = sales.aggregate(Sum('total_amount'))['total_amount__sum'] or 0
-    total_items = sales.aggregate(Sum('quantity_sold'))['quantity_sold__sum'] or 0
+    if query:
+        sale_items = sale_items.filter(product__product_name__icontains=query)
+
+    total_revenue = sale_items.aggregate(total=Sum('total_amount'))['total'] or 0
+    total_items = sale_items.aggregate(qty=Sum('quantity_sold'))['qty'] or 0
 
     return render(request, 'sales/sales_report.html', {
-        'sales': sales,
+        'sales': sale_items,
         'total_revenue': total_revenue,
         'total_items': total_items,
         'query': query,
         'start_date': start_date,
         'end_date': end_date,
     })
+
+def export_report_to_excel(request):
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = "Sales report"
+
+    # Define your headers
+    headers = ['Product', 'Quantity Sold', 'Selling Price', 'Total Amount', 'Date', 'Sold By']
+    ws.append(headers)
+
+    # Query the data
+    sale_items = SaleItem.objects.all()
+
+    for sale in sale_items:
+        ws.append([
+            sale.product.product_name,
+            sale.quantity_sold,
+            sale.product.selling_price,
+            sale.total_amount,
+            sale.sale.sold_on.strftime('%Y-%m-%d'),
+            sale.sale.cashier.email,
+        ])
+
+    # Auto width
+    for col in ws.columns:
+        max_length = 0
+        column = col[0].column
+        for cell in col:
+            try:
+                if len(str(cell.value)) > max_length:
+                    max_length = len(str(cell.value))
+            except:
+                pass
+        ws.column_dimensions[get_column_letter(column)].width = max_length + 2
+
+    # Create response
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename=Sales_report.xlsx'
+    wb.save(response)
+    return response
+
+
+
+
+
+
+
+
+
+
+
+

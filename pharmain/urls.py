@@ -18,6 +18,8 @@ from django.contrib import admin
 from django.urls import path, include
 from django.contrib.auth import views as auth_views
 from accounts import views as account_views
+from django.urls import path
+from .views import activity_log_view
 
 
 urlpatterns = [
@@ -36,6 +38,7 @@ urlpatterns = [
     path('users/<int:user_id>/delete/', account_views.deleteUser, name='delete-user'),
     path('my-profile/edit/', account_views.edit_my_profile, name='update-profile'),
     path('export-users/', account_views.export_users_to_excel, name='export-users'),
+    path('activity-log/', activity_log_view, name='activity-log'),
    
     # Password reset routes
     path('password-reset/', auth_views.PasswordResetView.as_view(template_name='accounts/password_reset.html'), name='password_reset'),

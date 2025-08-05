@@ -123,6 +123,11 @@ def export_users_to_excel(request):
     wb.save(response)
     return response
 
+@user_passes_test(lambda u: u.is_staff)
+def system_audit(request):
+        
+    return render(request, 'accounts/dashboard.html')
+
 
 
 

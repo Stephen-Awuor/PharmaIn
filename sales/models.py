@@ -4,13 +4,9 @@ from inventory.models import StockItem
 
 
 class Sale(models.Model):
-    product = models.ForeignKey(StockItem, on_delete=models.CASCADE)
-    quantity_sold = models.PositiveIntegerField()
-    selling_price = models.DecimalField(max_digits=10, decimal_places=2)
     total_amount = models.DecimalField(max_digits=10, decimal_places=2)
     sold_on = models.DateTimeField(auto_now_add=True)
     cashier = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True)
-
     def __str__(self):
         return f"Sale #{self.id} - {self.date.strftime('%Y-%m-%d %H:%M')}"
 
@@ -22,7 +18,7 @@ class SaleItem(models.Model):
     total_amount = models.DecimalField(max_digits=10, decimal_places=2)
 
     def get_total(self):
-        return self.quantity * self.price
+        return self.quantity_sold * self.product.selling_price
 
     def __str__(self):
-        return f"{self.quantity} x {self.product.product_name} (KES {self.price})"
+        return f"{self.quantity_sold} x {self.product.product_name} (KES {self.total_amount})"

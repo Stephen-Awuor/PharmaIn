@@ -1,3 +1,7 @@
+{% extends 'base/main.html' %}
+
+{% block content %}
+
 <h2>Sales Report</h2>
 
 <!-- Filter Form -->
@@ -12,8 +16,12 @@
     <input type="date" name="end_date" class="form-control" value="{{ end_date }}">
   </div>
   <div class="col-auto">
-    <button type="submit" class="btn btn-primary">Filter</button>
+    <button type="submit" class="btn btn-secondary">Filter</button>
   </div>
+  <div class="col-auto">
+      <button onclick="window.print()" class="btn btn-secondary me-2">Print</button>
+      <a href="{% url 'export-sales-report' %}" class="btn btn-secondary">Export</a>
+    </div>
 </form>
 
 <!-- Sales Table -->
@@ -31,18 +39,18 @@
     </tr>
   </thead>
   <tbody>
-    {% for sale in sales %}
-    <tr>
-      <td>{{ forloop.counter }}</td>
-      <td>{{ sale.product.product_name }}</td>
-      <td>{{ sale.quantity_sold }}</td>
-      <td>{{ sale.selling_price }}</td>
-      <td>{{ sale.total_amount }}</td>
-      <td>{{ sale.sold_on|date:"M d, Y H:i" }}</td>
-      <td>{{ sale.cashier }}</td>
-    </tr>
-    {% endfor %}
-  </tbody>
+  {% for sale in sales %}
+  <tr>
+    <td>{{ forloop.counter }}</td>
+    <td>{{ sale.product.product_name }}</td>
+    <td>{{ sale.quantity_sold }}</td>
+    <td>{{ sale.product.selling_price }}</td>
+    <td>{{ sale.total_amount }}</td>
+    <td>{{ sale.sale.sold_on|date:"M d, Y H:i" }}</td>
+    <td>{{ sale.sale.cashier }}</td>
+  </tr>
+  {% endfor %}
+</tbody>
 </table>
 
 <!-- Summary -->
@@ -50,3 +58,5 @@
   <p><strong>Total Items Sold:</strong> {{ total_items }}</p>
   <p><strong>Total Revenue:</strong> KES {{ total_revenue }}</p>
 </div>
+
+{% endblock %}

@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'customers',
     'widget_tweaks',
     'django.contrib.messages',
+    'pharmain',
 ]
 
 MIDDLEWARE = [
@@ -153,6 +154,10 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'stevekaneya@gmail.com'        # 👈 use your Gmail
 EMAIL_HOST_PASSWORD = 'fvwn nwir rzlm ytbz'  # 👈 use Gmail app password, not your real password
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+
+
+
 
 
 

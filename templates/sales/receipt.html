@@ -18,8 +18,8 @@
       {% for item in items %}
         <tr>
           <td>{{ item.product.product_name }}</td>
-          <td>{{ item.quantity }}</td>
-          <td>{{ item.price }}</td>
+          <td>{{ item.quantity_sold }}</td>
+          <td>{{ item.product.selling_price }}</td>
           <td>{{ item.get_total }}</td>
         </tr>
       {% endfor %}
